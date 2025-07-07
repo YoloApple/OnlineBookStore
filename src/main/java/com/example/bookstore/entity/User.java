@@ -14,6 +14,8 @@ public class User {
     private String username;
     private String email;
     private String password;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Cart cart;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -21,6 +23,14 @@ public class User {
     private Set<Role> roles = new HashSet<>();
 
     // Getters and Setters
+
+    public Cart getCart() {
+        return cart;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
 
     public Long getId() {
         return Id;

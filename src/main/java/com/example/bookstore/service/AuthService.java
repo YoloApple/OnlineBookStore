@@ -3,6 +3,7 @@ package com.example.bookstore.service;
 import com.example.bookstore.dto.JwtResponse;
 import com.example.bookstore.dto.LoginRequest;
 import com.example.bookstore.dto.RegisterRequest;
+import com.example.bookstore.entity.Cart;
 import com.example.bookstore.entity.Role;
 import com.example.bookstore.entity.User;
 import com.example.bookstore.repository.RoleRepository;
@@ -19,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,6 +55,12 @@ public class AuthService {
         user.setUsername(signUpRequest.getUsername());
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(encoder.encode(signUpRequest.getPassword()));
+
+        // ✅ Tạo Cart và liên kết với User
+        Cart cart = new Cart();
+        cart.setUser(user);
+        cart.setItems(new ArrayList<>());
+        user.setCart(cart);
 
         Set<String> strRoles = signUpRequest.getRoles();
         Set<Role> roles = new HashSet<>();
