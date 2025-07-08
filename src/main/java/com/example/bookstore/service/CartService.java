@@ -2,6 +2,7 @@ package com.example.bookstore.service;
 
 import com.example.bookstore.dto.CartItemRequest;
 import com.example.bookstore.dto.CartItemResponse;
+import com.example.bookstore.dto.CartSummaryResponse;
 import com.example.bookstore.entity.Cart;
 import com.example.bookstore.entity.CartItem;
 import com.example.bookstore.repository.BookRepository;
@@ -10,8 +11,8 @@ import com.example.bookstore.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CartService {
@@ -49,20 +50,28 @@ public class CartService {
         cartRepository.save(cart); // cascade sẽ tự lưu CartItem
     }
 
-    public List<CartItemResponse> getCart(String username) {
+    public CartSummaryResponse getCart(String username) {
         var user = userRepository.findByUsername(username).orElseThrow();
         Cart cart = user.getCart();
         List<CartItem> items = cart.getItems();
+        List<CartItemResponse> responseItems = new ArrayList<>();
+        double total = 0;
 
-        return items.stream().map(item -> {
+        for (CartItem item : items) {
             CartItemResponse dto = new CartItemResponse();
-            dto.setId(item.getId()); //  Set ID
-            dto.setBookId(item.getBook().getId()); // Set Book ID
+            dto.setId(item.getId());
+            dto.setBookId(item.getBook().getId());
             dto.setBookTitle(item.getBook().getTitle());
             dto.setQuantity(item.getQuantity());
             dto.setTotalPrice(item.getQuantity() * item.getBook().getPrice());
-            return dto;
-        }).collect(Collectors.toList());
+            responseItems.add(dto);
+
+            total += dto.getTotalPrice();
+        }
+        CartSummaryResponse response = new CartSummaryResponse();
+        response.setItems(responseItems);
+        response.setGrandTotal(total);
+        return response;
     }
 
     public void removeItemFromCart(String username, Long bookId) {

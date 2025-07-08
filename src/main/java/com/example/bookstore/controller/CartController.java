@@ -2,6 +2,7 @@ package com.example.bookstore.controller;
 
 import com.example.bookstore.dto.CartItemRequest;
 import com.example.bookstore.dto.CartItemResponse;
+import com.example.bookstore.dto.CartSummaryResponse;
 import com.example.bookstore.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +31,8 @@ public class CartController {
     // Lấy toàn bộ giỏ hàng của người dùng
     @GetMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<CartItemResponse>> getCart(Authentication authentication) {
-        List<CartItemResponse> cart = cartService.getCart(authentication.getName());
-        return ResponseEntity.ok(cart);
+    public ResponseEntity<CartSummaryResponse> getCart(Authentication authentication) {
+        return ResponseEntity.ok(cartService.getCart(authentication.getName()));
     }
 
     // Cập nhật số lượng sách trong giỏ
