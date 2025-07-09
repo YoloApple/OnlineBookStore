@@ -1,7 +1,6 @@
 package com.example.bookstore.service;
 
-import com.example.bookstore.dto.OrderItemResponse;
-import com.example.bookstore.dto.OrderResponse;
+import com.example.bookstore.dto.*;
 import com.example.bookstore.entity.Cart;
 import com.example.bookstore.entity.Order;
 import com.example.bookstore.entity.OrderItem;
@@ -76,4 +75,46 @@ public class OrderService {
             return res;
         }).collect(Collectors.toList());
     }
+    // service/OrderService.java
+    public List<OrderSellerDto> getOrdersForSeller(String sellerUsername) {
+        List<Order> orders = orderRepository.findOrdersBySellerUsername(sellerUsername);
+        return orders.stream().map(order -> {
+            OrderSellerDto dto = new OrderSellerDto();
+            dto.setOrderId(order.getId());
+            dto.setOrderDate(order.getOrderDate());
+            dto.setTotalPrice(order.getTotalPrice());
+            dto.setBuyerUsername(order.getUser().getUsername());
+
+            List<OrderItemSellerDto> itemDtos = order.getItems().stream()
+                    .filter(item -> item.getBook().getSeller().getUsername().equals(sellerUsername))
+                    .map(item -> {
+                        OrderItemSellerDto itemDto = new OrderItemSellerDto();
+                        itemDto.setBookTitle(item.getBook().getTitle());
+                        itemDto.setQuantity(item.getQuantity());
+                        itemDto.setPriceAtPurchase(item.getPriceAtPurchase());
+                        return itemDto;
+                    })
+                    .toList();
+
+            dto.setItems(itemDtos);
+            return dto;
+        }).toList();
+    }
+    public void updateOrderStatus(String sellerUsername, UpdateOrderStatusRequest request) {
+        Order order = orderRepository.findById(request.getOrderId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+
+        // Kiểm tra xem đơn hàng có chứa sách của seller hay không
+        boolean hasBookBySeller = order.getItems().stream()
+                .anyMatch(item -> item.getBook().getSeller().getUsername().equals(sellerUsername));
+
+        if (!hasBookBySeller) {
+            throw new RuntimeException("Bạn không có quyền cập nhật đơn hàng này");
+        }
+
+        order.setStatus(request.getNewStatus());
+        orderRepository.save(order);
+    }
+
+
 }

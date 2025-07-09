@@ -2,6 +2,8 @@ package com.example.bookstore.controller;
 
 
 import com.example.bookstore.dto.OrderResponse;
+import com.example.bookstore.dto.OrderSellerDto;
+import com.example.bookstore.dto.UpdateOrderStatusRequest;
 import com.example.bookstore.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,5 +33,23 @@ public class OrderController {
     public ResponseEntity<List<OrderResponse>> getOrders(Authentication auth) {
         return ResponseEntity.ok(orderService.getUserOrders(auth.getName()));
     }
+
+    // controller/OrderController.java
+    @GetMapping("/seller")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<List<OrderSellerDto>> getOrdersForSeller(Authentication auth) {
+        String sellerUsername = auth.getName();
+        List<OrderSellerDto> orders = orderService.getOrdersForSeller(sellerUsername);
+        return ResponseEntity.ok(orders);
+    }
+    @PutMapping("/update-status")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<String> updateOrderStatus(@RequestBody UpdateOrderStatusRequest request,
+                                                    Authentication auth) {
+        String sellerUsername = auth.getName();
+        orderService.updateOrderStatus(sellerUsername, request);
+        return ResponseEntity.ok("Cập nhật trạng thái đơn hàng thành công!");
+    }
+
 }
 
