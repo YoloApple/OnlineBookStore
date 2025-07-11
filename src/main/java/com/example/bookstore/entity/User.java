@@ -14,7 +14,7 @@ public class User {
     private String username;
     private String email;
     private String password;
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true)
     private Cart cart;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",

@@ -27,6 +27,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/books/**").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/books/add").hasRole("SELLER")
                 .requestMatchers("/api/cart/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/orders/place", "/api/orders").hasRole("USER")  // USER đặt hàng
