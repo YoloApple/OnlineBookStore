@@ -116,5 +116,44 @@ public class OrderService {
         orderRepository.save(order);
     }
 
+    public StatisticResponse getStatistics(String username, boolean isAdmin, StatisticRequest request) {
+        List<Order> orders;
 
+        if (isAdmin) {
+            orders = orderRepository.findAll();
+        } else {
+            orders = orderRepository.findOrdersBySellerUsername(username);
+        }
+
+        // Lọc theo thời gian
+        if (request.getStartDate() != null) {
+            orders = orders.stream()
+                    .filter(o -> !o.getOrderDate().toLocalDate().isBefore(request.getStartDate()))
+                    .collect(Collectors.toList());
+        }
+
+        if (request.getEndDate() != null) {
+            orders = orders.stream()
+                    .filter(o -> !o.getOrderDate().toLocalDate().isAfter(request.getEndDate()))
+                    .collect(Collectors.toList());
+        }
+
+        // Lọc theo trạng thái nếu có
+        if (request.getStatus() != null) {
+            orders = orders.stream()
+                    .filter(o -> o.getStatus() == request.getStatus())
+                    .collect(Collectors.toList());
+        }
+
+        long totalOrders = orders.size();
+        double totalRevenue = orders.stream()
+                .mapToDouble(Order::getTotalPrice)
+                .sum();
+        long totalBooksSold = orders.stream()
+                .flatMap(o -> o.getItems().stream())
+                .mapToLong(item -> item.getQuantity())
+                .sum();
+
+        return new StatisticResponse(totalOrders, totalRevenue, totalBooksSold);
+    }
 }

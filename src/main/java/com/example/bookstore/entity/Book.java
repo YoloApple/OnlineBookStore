@@ -17,7 +17,19 @@ public class Book {
     @JoinColumn(name = "seller_id")
     private User seller;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     // Getter Setter Constructors
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 
     public Long getId() {
         return id;

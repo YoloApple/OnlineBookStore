@@ -30,8 +30,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/books/add").hasRole("SELLER")
                 .requestMatchers("/api/cart/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/orders/statistics").hasAnyRole("ADMIN", "SELLER")
                 .requestMatchers("/api/orders/place", "/api/orders").hasRole("USER")  // USER đặt hàng
                 .requestMatchers("/api/orders/seller", "/api/orders/update-status").hasRole("SELLER") // SELLER xử lý đơn
+                .requestMatchers("/api/categories/**").hasAnyRole("ADMIN","SELLER")
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

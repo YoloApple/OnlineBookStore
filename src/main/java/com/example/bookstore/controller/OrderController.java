@@ -1,9 +1,7 @@
 package com.example.bookstore.controller;
 
 
-import com.example.bookstore.dto.OrderResponse;
-import com.example.bookstore.dto.OrderSellerDto;
-import com.example.bookstore.dto.UpdateOrderStatusRequest;
+import com.example.bookstore.dto.*;
 import com.example.bookstore.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +47,18 @@ public class OrderController {
         String sellerUsername = auth.getName();
         orderService.updateOrderStatus(sellerUsername, request);
         return ResponseEntity.ok("Cập nhật trạng thái đơn hàng thành công!");
+    }
+
+    @PostMapping("/statistics")
+    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
+    public ResponseEntity<StatisticResponse> getStatistics(@RequestBody StatisticRequest request,
+                                                           Authentication auth) {
+        String username = auth.getName();
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        StatisticResponse response = orderService.getStatistics(username, isAdmin, request);
+        return ResponseEntity.ok(response);
     }
 
 }
