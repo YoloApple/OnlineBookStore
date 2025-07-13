@@ -17,8 +17,8 @@ public class Book {
     @JoinColumn(name = "seller_id")
     private User seller;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
+    @ManyToOne(optional = false) // Bắt buộc có danh mục
+    @JoinColumn(name = "category_id",nullable = false)
     private Category category;
 
     // Getter Setter Constructors

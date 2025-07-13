@@ -34,11 +34,11 @@ public class BookController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<?> updateBook(@PathVariable Long id,
-                                        @RequestBody Book book,
-                                        Authentication auth){
-        return ResponseEntity.ok(bookService.updateBook(id,book,auth.getName()));
+                                        @RequestBody BookRequest request,
+                                        Authentication auth) {
+        bookService.updateBook(id, request, auth.getName());
+        return ResponseEntity.ok("Cập nhật sách thành công");
     }
-
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<?> deleteBook(@PathVariable Long id,Authentication auth){

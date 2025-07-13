@@ -5,6 +5,7 @@ public class BookRequest {
     private String author;
     private double price;
     private String description;
+    private Long categoryId;
 
     // Getter Setter
 
@@ -38,6 +39,14 @@ public class BookRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 }
 

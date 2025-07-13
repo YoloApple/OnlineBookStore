@@ -7,16 +7,17 @@ public class BookResponseDTO {
     private double price;
     private String description;
     private SellerDTO seller;
-
+    private String categoryName;
     // constructor, getters, setters
 
-    public BookResponseDTO(Long id, String title, String author, double price, String description, SellerDTO seller) {
+    public BookResponseDTO(Long id, String title, String author, double price, String description, SellerDTO seller,String categoryName) {
         this.id = id;
         this.title = title;
         this.author = author;
         this.price = price;
         this.description = description;
         this.seller = seller;
+        this.categoryName=categoryName;
     }
 
     public Long getId() {
@@ -65,6 +66,14 @@ public class BookResponseDTO {
 
     public void setSeller(SellerDTO seller) {
         this.seller = seller;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 }
 
