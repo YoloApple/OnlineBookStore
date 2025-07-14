@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
@@ -27,15 +28,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 // Cho phép toàn bộ auth (login, register, forgot/reset password)
                 .requestMatchers("/api/auth/**").permitAll()
-
+                .requestMatchers("/api/reviews/**").permitAll() // ai cũng xem được đánh giá
                 // Public book data
-                .requestMatchers("/api/books/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/books", "/api/books/{id}").permitAll()
 
                 // ADMIN
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                 // SELLER
-                .requestMatchers("/api/books/add").hasRole("SELLER")
+                .requestMatchers("/api/books/add", "/api/books/my-books").hasRole("SELLER")
                 .requestMatchers("/api/orders/seller", "/api/orders/update-status").hasRole("SELLER")
                 .requestMatchers("/api/shipping/**").hasRole("SELLER")
 

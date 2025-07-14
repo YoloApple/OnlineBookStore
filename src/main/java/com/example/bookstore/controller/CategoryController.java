@@ -40,4 +40,12 @@ public class CategoryController {
         categoryService.deleteCategory(id);
         return ResponseEntity.ok("Xóa danh mục thành công");
     }
+    @PostMapping("/bulk")
+    public ResponseEntity<String> addMultipleCategories(@RequestBody List<CategoryRequest> requests) {
+        for (CategoryRequest req : requests) {
+            categoryService.addCategory(req);
+        }
+        return ResponseEntity.ok("Thêm nhiều danh mục thành công");
+    }
+
 }

@@ -60,5 +60,15 @@ public class CartController {
         cartService.clearCart(authentication.getName());
         return ResponseEntity.ok("Đã xóa toàn bộ giỏ hàng");
     }
+    @PostMapping("/add-multiple")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<String> addMultipleToCart(@RequestBody List<CartItemRequest> requests,
+                                                    Authentication authentication) {
+        for (CartItemRequest req : requests) {
+            cartService.addToCart(authentication.getName(), req);
+        }
+        return ResponseEntity.ok("Đã thêm nhiều sách vào giỏ hàng thành công");
+    }
+
 }
 
