@@ -1,10 +1,8 @@
 package com.example.bookstore.service;
 
 import com.example.bookstore.dto.*;
-import com.example.bookstore.entity.Cart;
-import com.example.bookstore.entity.Order;
-import com.example.bookstore.entity.OrderItem;
-import com.example.bookstore.entity.User;
+import com.example.bookstore.entity.*;
+import com.example.bookstore.repository.AddressRepository;
 import com.example.bookstore.repository.CartRepository;
 import com.example.bookstore.repository.OrderRepository;
 import com.example.bookstore.repository.UserRepository;
@@ -21,7 +19,8 @@ public class OrderService {
    @Autowired private UserRepository userRepository;
    @Autowired private OrderRepository orderRepository;
    @Autowired private CartRepository cartRepository;
-
+   @Autowired
+   private AddressRepository addressRepository;
    @Transactional
     public void placeOrder(String username){
        User user = userRepository.findByUsername(username).orElseThrow();
@@ -155,5 +154,24 @@ public class OrderService {
                 .sum();
 
         return new StatisticResponse(totalOrders, totalRevenue, totalBooksSold);
+    }
+    @Transactional
+    public void assignShippingAddress(String username, Long orderId, Long addressId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+
+        if (!order.getUser().getUsername().equals(username)) {
+            throw new RuntimeException("Không có quyền cập nhật đơn này");
+        }
+
+        Address address = addressRepository.findById(addressId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy địa chỉ"));
+
+        if (!address.getUser().getUsername().equals(username)) {
+            throw new RuntimeException("Không có quyền sử dụng địa chỉ này");
+        }
+
+        order.setShippingAddress(address);
+        orderRepository.save(order);
     }
 }

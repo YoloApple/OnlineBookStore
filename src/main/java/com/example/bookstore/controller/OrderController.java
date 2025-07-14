@@ -61,5 +61,18 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/{orderId}/choose-address/{addressId}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> chooseAddress(@PathVariable Long orderId,
+                                           @PathVariable Long addressId,
+                                           Authentication auth) {
+        try {
+            orderService.assignShippingAddress(auth.getName(), orderId, addressId);
+            return ResponseEntity.ok("Đã chọn địa chỉ giao hàng");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }
 

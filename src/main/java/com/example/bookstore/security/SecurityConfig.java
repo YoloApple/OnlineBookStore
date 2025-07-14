@@ -34,6 +34,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/orders/place", "/api/orders").hasRole("USER")  // USER đặt hàng
                 .requestMatchers("/api/orders/seller", "/api/orders/update-status").hasRole("SELLER") // SELLER xử lý đơn
                 .requestMatchers("/api/categories/**").hasAnyRole("ADMIN","SELLER")
+                .requestMatchers("/api/addresses/**").hasRole("USER") // thêm và lấy địa chỉ
+                .requestMatchers("/api/orders/*/choose-address/**").hasRole("USER") // chọn địa chỉ giao hàng
+                .requestMatchers("/api/shipping/**").hasRole("SELLER")
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

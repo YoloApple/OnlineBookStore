@@ -20,6 +20,16 @@ public class Order {
     @OneToMany(mappedBy = "order",cascade = CascadeType.ALL)
     private List<OrderItem> items;
 
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus = PaymentStatus.UNPAID;
+
+    private LocalDateTime paidAt;
+    @ManyToOne
+    private Address shippingAddress;
+
+    private String shippingCode;
+    private LocalDateTime deliveredAt;
+
     public enum OrderStatus {
         PENDING,       // Mặc định khi mới đặt hàng
         CONFIRMED,     // Người bán đã xác nhận
@@ -27,7 +37,10 @@ public class Order {
         DELIVERED,     // Giao hàng thành công
         CANCELLED      // Đơn bị hủy
     }
-
+    public enum PaymentStatus {
+        UNPAID,
+        PAID
+    }
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.PENDING;
 
@@ -77,5 +90,45 @@ public class Order {
 
     public void setItems(List<OrderItem> items) {
         this.items = items;
+    }
+
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public LocalDateTime getPaidAt() {
+        return paidAt;
+    }
+
+    public void setPaidAt(LocalDateTime paidAt) {
+        this.paidAt = paidAt;
+    }
+
+    public Address getShippingAddress() {
+        return shippingAddress;
+    }
+
+    public void setShippingAddress(Address shippingAddress) {
+        this.shippingAddress = shippingAddress;
+    }
+
+    public String getShippingCode() {
+        return shippingCode;
+    }
+
+    public void setShippingCode(String shippingCode) {
+        this.shippingCode = shippingCode;
+    }
+
+    public LocalDateTime getDeliveredAt() {
+        return deliveredAt;
+    }
+
+    public void setDeliveredAt(LocalDateTime deliveredAt) {
+        this.deliveredAt = deliveredAt;
     }
 }
