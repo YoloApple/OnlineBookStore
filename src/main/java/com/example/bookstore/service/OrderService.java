@@ -19,8 +19,8 @@ public class OrderService {
    @Autowired private UserRepository userRepository;
    @Autowired private OrderRepository orderRepository;
    @Autowired private CartRepository cartRepository;
-   @Autowired
-   private AddressRepository addressRepository;
+   @Autowired private AddressRepository addressRepository;
+   @Autowired private EmailService emailService;
    @Transactional
     public void placeOrder(String username){
        User user = userRepository.findByUsername(username).orElseThrow();
@@ -48,6 +48,11 @@ public class OrderService {
        order.setTotalPrice(orderItems.stream().mapToDouble(i -> i.getPriceAtPurchase() * i.getQuantity()).sum());
        orderRepository.save(order);
 
+       String content = "Cảm ơn bạn đã đặt hàng!\nMã đơn hàng: " + order.getId() +
+               "\nTổng tiền: " + order.getTotalPrice() +
+               "\nNgày đặt: " + order.getOrderDate();
+
+       emailService.sendOrderConfirmation(user.getEmail(), "Đơn hàng #"+order.getId(), content);
 
        cart.getItems().clear();
        cartRepository.save(cart);

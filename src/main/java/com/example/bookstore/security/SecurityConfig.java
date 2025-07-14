@@ -25,18 +25,29 @@ public class SecurityConfig {
         http
                 .cors().and().csrf().disable()
                 .authorizeHttpRequests()
+                // Cho phép toàn bộ auth (login, register, forgot/reset password)
                 .requestMatchers("/api/auth/**").permitAll()
+
+                // Public book data
                 .requestMatchers("/api/books/**").permitAll()
+
+                // ADMIN
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                // SELLER
                 .requestMatchers("/api/books/add").hasRole("SELLER")
-                .requestMatchers("/api/cart/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/api/orders/statistics").hasAnyRole("ADMIN", "SELLER")
-                .requestMatchers("/api/orders/place", "/api/orders").hasRole("USER")  // USER đặt hàng
-                .requestMatchers("/api/orders/seller", "/api/orders/update-status").hasRole("SELLER") // SELLER xử lý đơn
-                .requestMatchers("/api/categories/**").hasAnyRole("ADMIN","SELLER")
-                .requestMatchers("/api/addresses/**").hasRole("USER") // thêm và lấy địa chỉ
-                .requestMatchers("/api/orders/*/choose-address/**").hasRole("USER") // chọn địa chỉ giao hàng
+                .requestMatchers("/api/orders/seller", "/api/orders/update-status").hasRole("SELLER")
                 .requestMatchers("/api/shipping/**").hasRole("SELLER")
+
+                // USER
+                .requestMatchers("/api/orders/place", "/api/orders").hasRole("USER")
+                .requestMatchers("/api/cart/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/addresses/**").hasRole("USER")
+                .requestMatchers("/api/orders/*/choose-address/**").hasRole("USER")
+
+                // Cả ADMIN và SELLER
+                .requestMatchers("/api/orders/statistics").hasAnyRole("ADMIN", "SELLER")
+                .requestMatchers("/api/categories/**").hasAnyRole("ADMIN", "SELLER")
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

@@ -19,10 +19,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 @Service
 public class AuthService {
@@ -31,7 +29,7 @@ public class AuthService {
     @Autowired private RoleRepository roleRepository;
     @Autowired private PasswordEncoder encoder;
     @Autowired private JwtUtils jwtUtils;
-
+    @Autowired private EmailService emailService;
     public JwtResponse authenticateUser(LoginRequest loginRequest){
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
@@ -89,4 +87,39 @@ public class AuthService {
         userRepository.save(user);
         return "Đăng ký thành công!";
     }
+    public void sendResetCodeToEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Email không tồn tại"));
+
+        String otp = String.valueOf(new Random().nextInt(900000) + 100000); // 6-digit
+        user.setResetToken(otp);
+        user.setTokenExpiration(LocalDateTime.now().plusMinutes(10));
+        userRepository.save(user);
+
+        emailService.sendOrderConfirmation(user.getEmail(), "Mã đặt lại mật khẩu",
+                "Mã xác thực để đặt lại mật khẩu là: " + otp + "\nMã có hiệu lực trong 10 phút.");
+    }
+
+    public void resetPassword(String email, String otp, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Email không tồn tại"));
+
+        if (user.getResetToken() == null || user.getTokenExpiration() == null) {
+            throw new RuntimeException("Bạn chưa yêu cầu mã xác thực");
+        }
+
+        if (!user.getResetToken().equals(otp)) {
+            throw new RuntimeException("Mã xác thực không đúng");
+        }
+
+        if (user.getTokenExpiration().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Mã xác thực đã hết hạn");
+        }
+
+        user.setPassword(encoder.encode(newPassword));
+        user.setResetToken(null);
+        user.setTokenExpiration(null);
+        userRepository.save(user);
+    }
+
 }
